@@ -1,0 +1,249 @@
+```html
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Einstein - Creat de Grok (dar zici că e al tău!)</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.5s ease, transform 0.5s ease;
+        }
+
+        .calculator {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+        }
+
+        #display {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            padding: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        button.operator {
+            background-color: #FF9800;
+        }
+
+        button.operator:hover {
+            background-color: #f57c00;
+        }
+
+        button.equals {
+            background-color: #2196F3;
+            grid-column: span 2;
+        }
+
+        button.equals:hover {
+            background-color: #1976D2;
+        }
+
+        button.clear {
+            background-color: #f44336;
+            grid-column: span 2;
+        }
+
+        button.clear:hover {
+            background-color: #d32f2f;
+        }
+
+        #message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            z-index: 10;
+        }
+
+        /* Efecte speciale pentru Einstein */
+        .einstein-mode {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcfcf, #4d96ff);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .near-einstein {
+            background-color: #ffd700; /* Auriu pentru aproape */
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .confetti span {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            opacity: 0.8;
+            animation: confettiFall 5s linear infinite;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('*')">*</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <button class="clear" onclick="clearDisplay()">C</button>
+        </div>
+    </div>
+    <div id="message"></div>
+    <div id="confetti" class="confetti"></div>
+
+    <script>
+        let display = document.getElementById('display');
+        let message = document.getElementById('message');
+        let body = document.body;
+        let confettiContainer = document.getElementById('confetti');
+
+        function appendToDisplay(value) {
+            display.value += value;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+            resetEffects();
+        }
+
+        function calculate() {
+            try {
+                let result = eval(display.value);
+                display.value = result;
+                checkForEinstein(result);
+            } catch (error) {
+                display.value = 'Eroare';
+                resetEffects();
+            }
+        }
+
+        function checkForEinstein(result) {
+            resetEffects();
+
+            if (result === 67 || result === 6.7) {
+                body.classList.add('einstein-mode');
+                message.textContent = 'Bro e Einstein!! Ce face blud? 🚀🧠';
+                message.style.opacity = 1;
+                message.style.transform = 'translate(-50%, -50%) scale(1.2)';
+                createConfetti();
+                setTimeout(resetEffects, 5000); // Resetează după 5 secunde
+            } else if (isCloseToEinstein(result)) {
+                body.classList.add('near-einstein');
+                message.textContent = 'Bro e aproape de Einstein! Mai încearcă, geniu în devenire! 🌟';
+                message.style.opacity = 1;
+                message.style.transform = 'translate(-50%, -50%) scale(1.1)';
+                setTimeout(resetEffects, 3000); // Resetează după 3 secunde
+            }
+        }
+
+        function isCloseToEinstein(result) {
+            // Aproape de 67: între 60 și 74, sau aproape de 6.7: între 6 și 7.4
+            return (result >= 60 && result <= 74) || (result >= 6 && result <= 7.4);
+        }
+
+        function resetEffects() {
+            body.classList.remove('einstein-mode', 'near-einstein');
+            message.style.opacity = 0;
+            message.style.transform = 'translate(-50%, -50%) scale(1)';
+            confettiContainer.innerHTML = '';
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 100; i++) {
+                let confetti = document.createElement('span');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confettiContainer.appendChild(confetti);
+            }
+        }
+    </script>
+</body>
+</html>
+```
